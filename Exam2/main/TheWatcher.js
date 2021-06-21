@@ -32,7 +32,7 @@ class TheWatcher {
 
 		console.log(chalk.green(`Watching path: ${dir}`));
 
-		fs.watch(dir, { }, (eventType, filename) => {
+		fs.watch(dir, { recursive: true }, (eventType, filename) => {
 			if (filename) {
 				this.fileChecker.checkFile(dir, filename, name);
 			}
