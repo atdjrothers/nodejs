@@ -1,0 +1,109 @@
+### Get all failed
+GET http://localhost:3000/digimon
+
+### Get all
+GET http://localhost:3000/pokemons
+
+### Create Lucario
+POST http://localhost:3000/pokemons
+Content-Type: application/json
+
+{ 
+	"name": "Lucario", 
+	"type": "Fighting-Steel", 
+	"generation": "4" 
+}
+
+### Create Tyranitar
+POST http://localhost:3000/pokemons
+Content-Type: application/json
+
+{ 
+	"name": "Tyranitar", 
+	"type": "Rock-Dark", 
+	"genaration": "2" 
+}
+
+### Create Latios
+POST http://localhost:3000/pokemons
+Content-Type: application/json
+
+{ 
+	"name": "Latios", 
+	"type": "Dragon-Psychic", 
+	"generation": "3" 
+}
+
+
+/// Weekly Exam Assertions
+
+### Get Lucario
+GET http://localhost:3000/pokemons?name=lucario
+
+### Get Tyranitar
+GET http://localhost:3000/pokemons?name=tyranitar
+
+### Get Latios
+GET http://localhost:3000/pokemons?name=latios
+
+### Delete
+DELETE http://localhost:3000/pokemons?name=Tyranitar
+
+
+### Delete
+DELETE http://localhost:3000/pokemons?name=Tyrant
+
+
+### Update - Should update Lucario
+PUT http://localhost:3000/pokemons?name=Lucario
+Content-Type: application/json
+
+{
+	"type": "Fighting",
+	"generation": "3"
+}
+
+### Create Milotic
+POST http://localhost:3000/pokemons
+Content-Type: application/json
+
+{ 
+	"name": "Milotic", 
+	"type": "Water", 
+	"generation": "3" 
+}
+
+### Update - Update success, generation property is optional
+PUT http://localhost:3000/pokemons?name=Milotic
+Content-Type: application/json
+
+{
+	"type": "Fire"
+}
+
+### Update - Update fail, type property is missing
+PUT http://localhost:3000/servants?name=Milotic
+Content-Type: application/json
+
+{
+	"generation": "3"
+}
+
+### Update - Update will fail, type property is blank
+PUT http://localhost:3000/pokemons?name=Milotic
+Content-Type: application/json
+
+{
+	"type": "",
+	"generation": "3"
+}
+
+### Update - Update will fail, Talonflame is missing
+PUT http://localhost:3000/pokemons?name=Talonflame
+Content-Type: application/json
+
+{
+	"type": "Fire-Flying",
+	"generation": "4"
+}
+

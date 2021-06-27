@@ -1,0 +1,18 @@
+{
+  "pokemons": [
+    {
+      "type": "Fighting",
+      "generation": "3",
+      "name": "Lucario"
+    },
+    {
+      "name": "Latios",
+      "type": "Dragon-Psychic",
+      "generation": "3"
+    },
+    {
+      "type": "Fire",
+      "name": "Milotic"
+    }
+  ]
+}
