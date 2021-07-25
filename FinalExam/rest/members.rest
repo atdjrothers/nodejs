@@ -1,0 +1,29 @@
+### Get all failed
+GET http://localhost:4000/member
+
+### Get all
+GET http://localhost:4000/api/members
+
+### Create Lucario
+POST http://localhost:4000/api/members
+Content-Type: application/json
+
+{ 
+	"name": "Lucario", 
+	"type": "Fighting-Steel", 
+	"generation": "4" 
+}
+
+### Update - Should update Lucario
+PUT http://localhost:4000/api/members?name=Lucario
+Content-Type: application/json
+
+{
+	"memberId": "",
+	"status": "In-active",
+	"joinedDate": "3"
+}
+
+### Delete
+DELETE http://localhost:4000/id
+

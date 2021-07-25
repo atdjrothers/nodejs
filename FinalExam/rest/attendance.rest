@@ -1,0 +1,13 @@
+### Create Lucario
+POST http://localhost:4000/api/attendance
+Content-Type: application/json
+
+{
+	"memberId": "Lucario", 
+	"timeIn": "", 
+	"timeOut": "" 
+}
+
+### Delete
+DELETE http://localhost:4000/1
+
