@@ -4,26 +4,37 @@ GET http://localhost:4000/member
 ### Get all
 GET http://localhost:4000/api/members
 
-### Create Lucario
+### Create Zeus
 POST http://localhost:4000/api/members
 Content-Type: application/json
 
 { 
-	"name": "Lucario", 
-	"type": "Fighting-Steel", 
-	"generation": "4" 
+	"name": "Zeus",
+	"status": "Active",
+	"joinedDate": "2021-07-25"
+}
+
+### Create Invalid Status
+POST http://localhost:4000/api/members
+Content-Type: application/json
+
+{ 
+	"name": "Storm Spirit",
+	"status": "Actively",
+	"joinedDate": "2021-07-27"
 }
 
 ### Update - Should update Lucario
-PUT http://localhost:4000/api/members?name=Lucario
+PUT http://localhost:4000/api/members
 Content-Type: application/json
 
 {
-	"memberId": "",
-	"status": "In-active",
-	"joinedDate": "3"
+	"id": "f15410b3-1ba1-4078-a004-5359041f6d53",
+	"name": "Lightning Revenant",
+	"status": "Active",
+	"joinedDate": "2021-01-26"
 }
 
 ### Delete
-DELETE http://localhost:4000/id
+DELETE http://localhost:4000/api/members/d29f0106-3a59-45ee-b742-ddac6b4a1eb9
 

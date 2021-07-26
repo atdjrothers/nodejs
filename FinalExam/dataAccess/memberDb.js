@@ -13,6 +13,11 @@ class MemberDataAccess extends DataAccess {
 
         return data;
     }
+
+    async updateMember(data) {
+        await this.update(data);
+        return;
+    }
 }
 
 module.exports = new MemberDataAccess();

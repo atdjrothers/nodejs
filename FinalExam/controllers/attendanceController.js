@@ -1,4 +1,6 @@
-const { attendanceDataAccess } = require('../dataAccess');
+const { attendanceDataAccess, eventDataAccess, memberDataAccess } = require('../dataAccess');
+const { APP_CONSTANTS } = require('../util');
+const Joi = require('joi').extend(require('@joi/date'));
 
 /**
  * https://jsdoc.app/
@@ -7,22 +9,6 @@ const { attendanceDataAccess } = require('../dataAccess');
  * @typedef {import('express').NextFunction} NextFunction
  */
 
-/**
- * Validate Required fields.
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
- */
-const validateRequestRequiredPayload = (req, res, next) => {
-	const payload = req.body;
-	const areAllPropsPresent = ['attendancename', 'emailAddress'].every(requiredProp => requiredProp in payload);
-
-	if (areAllPropsPresent) {
-		return next();
-	}
-
-	res.status(400).send('attendancename/emailAddress must be present in the payload');
-};
 
 /**
  * Validate if Attendancename or Email Address already exists.
@@ -32,17 +18,28 @@ const validateRequestRequiredPayload = (req, res, next) => {
  */
 const validateCreateRequest = async (req, res, next) => {
 	const payload = req.body;
+	const schema = Joi.object({
+		eventId: Joi.string().required(),
+		memberId: Joi.string().required(),
+		timeIn: Joi.date().format(APP_CONSTANTS.DATETIME_FORMAT).utc(),
+		timeOut: Joi.date().format(APP_CONSTANTS.DATETIME_FORMAT).utc()
+	});
 
-	const emailAddress = payload.emailAddress;
-	if (!validateEmail(emailAddress)) {
-		return res.status(409).send('Invalid Email Address.');
+	const { error } = schema.validate(payload);
+	if (error) {
+		res.status(400).send(error.message);
 	}
 
-	if (await attendanceDataAccess.getAttendanceByAttendancename(payload.attendancename)) {
-		return res.status(409).send('Attendancename already exists.');
+	const member = await memberDataAccess.getById(payload.memberId);
+	if (!member) {
+		res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_RECORD_NOT_FOUND);
+	} else {
+		req.body.name = member.name;
 	}
-	else if (await attendanceDataAccess.getAttendanceByEmailAddress(payload.emailAddress)) {
-		return res.status(409).send('Email Address already exists.');
+
+	const event = await eventDataAccess.getById(payload.eventId);
+	if (!event) {
+		res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND);
 	}
 
 	next();
@@ -71,20 +68,18 @@ const insertAttendance = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const deleteAttendance = async (req, res, next) => {
-	const attendancename = req.params.attendancename;
-	const attendance = await attendanceDataAccess.getAttendanceByAttendancename(attendancename);
+	const id = req.params.id;
+	const attendance = await attendanceDataAccess.getById(id);
 	if (attendance) {
-		await attendanceDataAccess.delete(attendancename);
+		await attendanceDataAccess.delete(id);
 		res.sendStatus(200);
 	} else {
-		res.sendStatus(404);
+		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.ATTENDANCE_RECORD_NOT_FOUND);
 	}
-
 };
 
 
 module.exports = {
-	validateRequestRequiredPayload,
 	validateCreateRequest,
 	insertAttendance,
 	deleteAttendance

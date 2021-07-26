@@ -1,4 +1,6 @@
 const { memberDataAccess } = require('../dataAccess');
+const { APP_CONSTANTS } = require('../util');
+const Joi = require('joi').extend(require('@joi/date'));
 
 /**
  * https://jsdoc.app/
@@ -51,23 +53,6 @@ const getMemberByParams = async (req, res, next) => {
 
 
 /**
- * Validate Required fields.
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
- */
-const validateRequestRequiredPayload = (req, res, next) => {
-	const payload = req.body;
-	const areAllPropsPresent = ['membername', 'emailAddress'].every(requiredProp => requiredProp in payload);
-
-	if (areAllPropsPresent) {
-		return next();
-	}
-
-	res.status(400).send('membername/emailAddress must be present in the payload');
-};
-
-/**
  * Validate if Membername or Email Address already exists.
  * @param {Request} req
  * @param {Response} res
@@ -76,19 +61,19 @@ const validateRequestRequiredPayload = (req, res, next) => {
 const validateCreateRequest = async (req, res, next) => {
 	const payload = req.body;
 
-	const emailAddress = payload.emailAddress;
-	if (!validateEmail(emailAddress)) {
-		return res.status(409).send('Invalid Email Address.');
-	}
+	const schema = Joi.object({
+		name: Joi.string().required(),
+		// name: Joi.string().pattern("/^[a-z ,.'-]+$/i").required(),
+		status: Joi.any().valid(...Object.values(APP_CONSTANTS.STATUS)).required(),
+		joinedDate: Joi.date().format(APP_CONSTANTS.DATE_FORMAT).utc()
+	});
 
-	if (await memberDataAccess.getMemberByMembername(payload.membername)) {
-		return res.status(409).send('Membername already exists.');
+	const { error } = schema.validate(payload);
+	if (error) {
+		res.status(400).send(error.message);
+	} else {
+		next();
 	}
-	else if (await memberDataAccess.getMemberByEmailAddress(payload.emailAddress)) {
-		return res.status(409).send('Email Address already exists.');
-	}
-
-	next();
 };
 
 
@@ -113,34 +98,20 @@ const insertMember = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const validateUpdateRequest = async (req, res, next) => {
-	const membername = req.params.membername;
-	const member = await memberDataAccess.getMemberByMembername(membername);
-	if (!member) {
-		return res.status(409).send('Membername does exists.');
-	}
-
 	const payload = req.body;
-	const payloadPropNames = Object.keys(payload);
-	const hasMembername = payloadPropNames.indexOf('membername');
-	if (hasMembername > -1) {
-		return res.status(400).send('Membername not valid in request payload.');
-	}
+	const schema = Joi.object({
+		id: Joi.string().required(),
+		name: Joi.string().required(),
+		status: Joi.any().valid(...Object.values(APP_CONSTANTS.STATUS)).required(),
+		joinedDate: Joi.date().format(APP_CONSTANTS.DATE_FORMAT).utc()
+	});
 
-	if (payloadPropNames.indexOf('emailAddress') < 0) {
-		return res.status(409).send('Email Address is required.');
+	const { error } = schema.validate(payload);
+	if (error) {
+		res.status(400).send(error.message);
+	} else {
+		next();
 	}
-
-	const emailAddress = payload.emailAddress.toLowerCase();
-	if (!validateEmail(emailAddress)) {
-		return res.status(409).send('Invalid Email Address.');
-	}
-
-	const memberByEmail = await memberDataAccess.getMemberByEmailAddress(emailAddress);
-	if (memberByEmail && memberByEmail.membername != membername) {
-		return res.status(409).send('Email Address already exists.');
-	}
-
-	next();
 };
 
 /**
@@ -150,11 +121,8 @@ const validateUpdateRequest = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const updateMember = async (req, res, next) => {
-	const membername = req.params.membername;
 	const payload = req.body;
-
-	await memberDataAccess.update(membername, payload);
-
+	await memberDataAccess.updateMember(payload);
 	res.sendStatus(200);
 };
 
@@ -165,30 +133,20 @@ const updateMember = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const deleteMember = async (req, res, next) => {
-	const membername = req.params.membername;
-	const member = await memberDataAccess.getMemberByMembername(membername);
+	const id = req.params.id;
+	const member = await memberDataAccess.getById(id);
 	if (member) {
-		await memberDataAccess.delete(membername);
+		await memberDataAccess.delete(id);
 		res.sendStatus(200);
 	} else {
 		res.sendStatus(404);
 	}
-
 };
-
-/**
- * Validate email.
- */
-const validateEmail = (email) => {
-	const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	return re.test(String(email).toLowerCase());
-}
 
 module.exports = {
 	getAllMembers,
 	getMemberById,
 	getMemberByParams,
-	validateRequestRequiredPayload,
 	validateCreateRequest,
 	validateUpdateRequest,
 	insertMember,

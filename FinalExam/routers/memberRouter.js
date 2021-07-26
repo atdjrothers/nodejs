@@ -9,7 +9,6 @@ router.get('/search', memberController.getMemberByParams);
 
 
 router.post('/',
-    memberController.validateRequestRequiredPayload,
     memberController.validateCreateRequest,
     memberController.insertMember
 );

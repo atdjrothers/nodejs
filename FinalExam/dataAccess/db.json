@@ -1,5 +1,43 @@
 {
-  "events": [],
-  "members": [],
-  "attendance": []
+  "events": [
+    {
+      "id": "a4ca19e0-5066-4897-a9fd-785f8aee328f",
+      "eventName": "Daily Stand Up",
+      "eventType": "Meeting",
+      "startDate": "2021-07-27 22:45",
+      "endDate": "2021-07-27 23:30"
+    }
+  ],
+  "members": [
+    {
+      "id": "87fcf9f4-b3c7-421e-920e-a47dfc82c626",
+      "name": "Zeus",
+      "status": "Active",
+      "joinedDate": "2021-07-25"
+    },
+    {
+      "id": "f15410b3-1ba1-4078-a004-5359041f6d53",
+      "name": "Lightning Revenant",
+      "status": "Active",
+      "joinedDate": "2021-01-26"
+    }
+  ],
+  "attendance": [
+    {
+      "id": "5ea35d05-3840-4026-88e6-b9234564edc7",
+      "eventId": "a4ca19e0-5066-4897-a9fd-785f8aee328f",
+      "memberId": "87fcf9f4-b3c7-421e-920e-a47dfc82c626",
+      "timeIn": "2021-07-25 13:05",
+      "timeOut": "2021-07-25 17:00",
+      "name": "Zeus"
+    },
+    {
+      "id": "708e51bd-8e91-486f-928e-e1f2ff2ef7b7",
+      "eventId": "a4ca19e0-5066-4897-a9fd-785f8aee328f",
+      "memberId": "f15410b3-1ba1-4078-a004-5359041f6d53",
+      "timeIn": "2021-07-25 13:00",
+      "timeOut": "2021-07-25 17:00",
+      "name": "Lightning Revenant"
+    }
+  ]
 }

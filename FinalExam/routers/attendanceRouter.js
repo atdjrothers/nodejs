@@ -1,24 +1,13 @@
 const express = require('express');
-const { memberController } = require('../controllers');
+const { attendanceController } = require('../controllers');
 
 const router = express.Router();
 
-router.get('/', memberController.getAllMembers);
-router.get('/:id', memberController.getMemberById);
-router.get('/search', memberController.getMemberByParams);
-
-
 router.post('/',
-    memberController.validateRequestRequiredPayload,
-    memberController.validateCreateRequest,
-    memberController.insertMember
+    attendanceController.validateCreateRequest,
+    attendanceController.insertAttendance
 );
 
-router.put('/',
-    memberController.validateUpdateRequest,
-    memberController.updateMember
-);
-
-router.delete('/:id', memberController.deleteMember);
+router.delete('/:id', attendanceController.deleteAttendance);
 
 module.exports = router;

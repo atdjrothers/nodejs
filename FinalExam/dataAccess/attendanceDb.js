@@ -13,6 +13,15 @@ class AttendanceDataAccess extends DataAccess {
 
         return data;
     }
+
+    async getAllAttendanceByProp(propName, value) {
+        const data = await this.getAllByProp({
+            propName: propName,
+            propValue: value
+        });
+
+        return data;
+    }
 }
 
 module.exports = new AttendanceDataAccess();

@@ -1,13 +1,49 @@
-### Create Lucario
+### Create Invalid memberId
+POST http://localhost:4000/api/attendance
+
+Content-Type: application/json
+{
+	"eventId": "12315",
+	"memberId": "Lucario", 
+	"timeIn": "2021-07-25 13:00", 
+	"timeOut": "2021-07-25 17:00" 
+}
+
+### Create Invalid eventId
+POST http://localhost:4000/api/attendance
+
+Content-Type: application/json
+{
+	"eventId": "12315",
+	"memberId": "f15410b3-1ba1-4078-a004-5359041f6d53", 
+	"timeIn": "2021-07-25 13:00", 
+	"timeOut": "2021-07-25 17:00" 
+}
+
+
+### Create attendance
 POST http://localhost:4000/api/attendance
 Content-Type: application/json
 
 {
-	"memberId": "Lucario", 
-	"timeIn": "", 
-	"timeOut": "" 
+	"eventId": "a4ca19e0-5066-4897-a9fd-785f8aee328f",
+	"memberId": "f15410b3-1ba1-4078-a004-5359041f6d53", 
+	"timeIn": "2021-07-25 13:00", 
+	"timeOut": "2021-07-25 17:00" 
 }
 
+### Create attendance
+POST http://localhost:4000/api/attendance
+Content-Type: application/json
+
+{
+	"eventId": "a4ca19e0-5066-4897-a9fd-785f8aee328f",
+	"memberId": "87fcf9f4-b3c7-421e-920e-a47dfc82c626", 
+	"timeIn": "2021-07-25 13:05", 
+	"timeOut": "2021-07-25 17:00" 
+}
+
+
 ### Delete
-DELETE http://localhost:4000/1
+DELETE http://localhost:4000/api/attendance/97cc27b3-8cc2-45a2-a873-883d9a808a7c
 

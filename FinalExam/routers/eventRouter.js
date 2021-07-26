@@ -4,11 +4,9 @@ const { eventController } = require('../controllers');
 const router = express.Router();
 
 router.get('/', eventController.getAllEvents);
-// router.get('/search', userController.getUserByUsername);
-//router.get('/export', userController.getUserByUsername);
+router.get('/:id', eventController.getEventById);
 
 router.post('/',
-    eventController.validateRequestRequiredPayload,
     eventController.validateCreateRequest,
     eventController.insertEvent
 );

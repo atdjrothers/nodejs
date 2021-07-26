@@ -4,25 +4,43 @@ GET http://localhost:4000/events
 ### Get all
 GET http://localhost:4000/api/events
 
-### Create Lucario
+### Get event
+GET http://localhost:4000/api/events/a4ca19e0-5066-4897-a9fd-785f8aee328f
+
+### Create DSU
 POST http://localhost:4000/api/events
 Content-Type: application/json
 
 { 
-	"name": "Lucario", 
-	"type": "Fighting-Steel", 
-	"generation": "4" 
+	"eventName": "Daily Stand Up",
+	"eventType": "Meeting",
+	"startDate": "2021-07-27 22:45",
+	"endDate": "2021-07-27 23:30"
 }
 
-### Update - Should update Lucario
-PUT http://localhost:4000/api/events?name=Lucario
+### Create DSU Invalid Event Type
+POST http://localhost:4000/api/events
 Content-Type: application/json
 
-{
-	"type": "Fighting",
-	"generation": "3"
+{ 
+	"eventName": "Daily Stand Up",
+	"eventType": "Graduation",
+	"startDate": "2021-07-27 22:45",
+	"endDate": "2021-07-27 23:30"
+}
+
+### Update - Should update Daily Stand Up
+PUT http://localhost:4000/api/events
+Content-Type: application/json
+
+{ 
+	"id": "b86604d8-267d-42e0-ac55-ad237f8f845a",
+	"eventName": "Daily Stand Up",
+	"eventType": "Masters",
+	"startDate": "2021-07-27 22:45",
+	"endDate": "2021-07-27 23:30"
 }
 
 ### Delete
-DELETE http://localhost:4000/id
+DELETE http://localhost:4000/api/events/6a2eadc0-8124-488c-9f38-f8a7d1aaef75
 

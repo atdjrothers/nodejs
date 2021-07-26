@@ -36,6 +36,15 @@ class DataAccess {
             .value();
     }
 
+    async getAllByProp({ propName, propValue }) {
+        const dbContext = await this.dbContext;
+
+        return dbContext
+            .get(this.tableName)
+            .filter(c => c[propName] === propValue)
+            .value();
+    }
+
     async insert(data) {
         const dbContext = await this.dbContext;
         const id = uuid();
@@ -50,9 +59,9 @@ class DataAccess {
         return this.getById(id);
     }
 
-    async update(id, data) {
+    async update(data) {
         const dbContext = await this.dbContext;
-
+        const id = data.id;
         dbContext.get(this.tableName)
             .find({ id })
             .assign(data)
@@ -61,7 +70,6 @@ class DataAccess {
 
     async delete(id) {
         const dbContext = await this.dbContext;
-
         dbContext
             .get(this.tableName)
             .remove({ id })
