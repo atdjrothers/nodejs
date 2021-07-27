@@ -13,6 +13,10 @@ GET http://localhost:4000/api/events/search?eventName=Daily Stand Up
 ### Get event by name, startDate, endDate
 GET http://localhost:4000/api/events/search?eventName=Daily Stand Up&startDate=2021-07-27&endDate=2021-07-27
 
+### Export event to excel file by eventId
+### Please put URL into the browser to get the excel file
+GET http://localhost:4000/api/events/export?eventId=a4ca19e0-5066-4897-a9fd-785f8aee328f
+
 ### Create DSU
 POST http://localhost:4000/api/events
 Content-Type: application/json

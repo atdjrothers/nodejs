@@ -1,6 +1,7 @@
 const Joi = require('joi').extend(require('@joi/date'));
-const { APP_CONSTANTS } = require('../util');
+const { APP_CONSTANTS, EXCEL_UTIL } = require('../util');
 const { eventDataAccess, attendanceDataAccess } = require('../dataAccess');
+const _ = require('lodash');
 
 /**
  * https://jsdoc.app/
@@ -65,6 +66,25 @@ const getEventByParams = async (req, res, next) => {
 		res.send(output);
 	} else {
 		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.NO_RECORDS_FOUND);
+	}
+};
+
+
+/**
+ * Export event to excel file by id.
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+ const exportEventById = async (req, res, next) => {
+	const event = await eventDataAccess.getById(req.query.eventId);
+	if (event) {
+		const attendance = await attendanceDataAccess.getAllAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.EVENT_ID, req.query.eventId);
+		const data = _.orderBy(attendance, ['timeIn'], ['asc']);
+		const fileName = `${event.eventName}_${event.startDate}.xlsx`;
+		EXCEL_UTIL.generateExcelFile(data).write(fileName, res);
+	} else {
+		res.sendStatus(404);
 	}
 };
 
@@ -174,6 +194,7 @@ module.exports = {
 	getAllEvents,
 	getEventById,
 	getEventByParams,
+	exportEventById,
 	validateCreateRequest,
 	validateUpdateRequest,
 	insertEvent,
