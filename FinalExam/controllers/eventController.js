@@ -43,8 +43,29 @@ const getEventById = async (req, res, next) => {
  * @param {Response} res
  * @param {NextFunction} next
  */
-const getEventByParam = async (req, res, next) => {
-	res.sendStatus(404).send('TODO missing implementation');
+const getEventByParams = async (req, res, next) => {
+	const eventName = req.query.eventName;
+	const startDate = req.query.startDate;
+	const endDate = req.query.endDate;
+	let obj = {};
+	if (eventName) {
+		obj = { ...obj, eventName };
+	}
+
+	if (startDate) {
+		obj = { ...obj, startDate };
+	}
+
+	if (endDate) {
+		obj = { ...obj, endDate };
+	}
+
+	const output = await eventDataAccess.getAllFilterByProps(obj);
+	if (output) {
+		res.send(output);
+	} else {
+		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.NO_RECORDS_FOUND);
+	}
 };
 
 /**
@@ -111,7 +132,6 @@ const validateUpdateRequest = async (req, res, next) => {
 		res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND);
 	}
 
-	console.log('validateUpdateRequest=', error, event);
 	next();
 };
 
@@ -137,24 +157,23 @@ const deleteEvent = async (req, res, next) => {
 	const id = req.params.id;
 	const event = await eventDataAccess.getById(id);
 	if (event) {
-		await eventDataAccess.delete(id);
-		const attendance = await attendanceDataAccess.getAllAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.EVENT_ID, id);
-		const length = attendance.length;
-		for(let i = 0; i < length; i++) {
-			const obj = attendance[i];
-			await attendanceDataAccess.delete(obj.id);
+		const attendance = await attendanceDataAccess.getAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.EVENT_ID, id);
+		if (attendance) {
+			res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_DELETE_FAILED_ATTENDANCE_FOUND);
+		} else {
+			await eventDataAccess.delete(id);
+			res.sendStatus(200);
 		}
 
-		res.sendStatus(200);
 	} else {
-		res.sendStatus(404).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND);
+		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND);
 	}
-
 };
 
 module.exports = {
 	getAllEvents,
 	getEventById,
+	getEventByParams,
 	validateCreateRequest,
 	validateUpdateRequest,
 	insertEvent,

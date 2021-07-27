@@ -4,6 +4,21 @@ GET http://localhost:4000/member
 ### Get all
 GET http://localhost:4000/api/members
 
+### Get by id
+GET http://localhost:4000/api/members/f15410b3-1ba1-4078-a004-5359041f6d53
+
+### Get by name
+GET http://localhost:4000/api/members/search?name=Zeus
+
+### Get by status
+GET http://localhost:4000/api/members/search?status=Active
+
+### Get by joinedDate
+GET http://localhost:4000/api/members/search?joinedDate=2021-07-26
+
+### Get by name and status
+GET http://localhost:4000/api/members/search?name=Lightning Revenant&status=Active
+
 ### Create Zeus
 POST http://localhost:4000/api/members
 Content-Type: application/json
@@ -36,5 +51,5 @@ Content-Type: application/json
 }
 
 ### Delete
-DELETE http://localhost:4000/api/members/d29f0106-3a59-45ee-b742-ddac6b4a1eb9
+DELETE http://localhost:4000/api/members/f15410b3-1ba1-4078-a004-5359041f6d53
 

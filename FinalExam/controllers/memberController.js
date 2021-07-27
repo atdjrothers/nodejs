@@ -1,4 +1,4 @@
-const { memberDataAccess } = require('../dataAccess');
+const { memberDataAccess, attendanceDataAccess } = require('../dataAccess');
 const { APP_CONSTANTS } = require('../util');
 const Joi = require('joi').extend(require('@joi/date'));
 
@@ -28,9 +28,11 @@ const getAllMembers = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const getMemberById = async (req, res, next) => {
-	const member = await memberDataAccess.getMemberById(req.params.id);
+	const member = await memberDataAccess.getById(req.params.id);
 	if (member) {
-		res.send(member);
+		const attendance = await attendanceDataAccess.getAllAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.MEMBER_ID, req.params.id);
+		const output = { ...member, attendance }
+		res.send(output);
 	} else {
 		res.sendStatus(404);
 	}
@@ -43,11 +45,22 @@ const getMemberById = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const getMemberByParams = async (req, res, next) => {
-	const member = await memberDataAccess.getMemberByProp(req.params.emailAddress, null); //TODO
-	if (member) {
-		res.send(member);
+	const name = req.query.name;
+	const status = req.query.status;
+	let obj = {};
+	if (name) {
+		obj = { ...obj, name };
+	}
+
+	if (status) {
+		obj = { ...obj, status };
+	}
+
+	const output = await memberDataAccess.getAllFilterByProps(obj);
+	if (output) {
+		res.send(output);
 	} else {
-		res.sendStatus(404);
+		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.NO_RECORDS_FOUND);
 	}
 };
 
@@ -136,8 +149,14 @@ const deleteMember = async (req, res, next) => {
 	const id = req.params.id;
 	const member = await memberDataAccess.getById(id);
 	if (member) {
-		await memberDataAccess.delete(id);
-		res.sendStatus(200);
+		const attendance = await attendanceDataAccess.getAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.MEMBER_ID, id);
+		if (attendance) {
+			res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_DELETE_FAILED_ATTENDANCE_FOUND);
+		} else {
+			await memberDataAccess.delete(id);
+			res.sendStatus(200);
+		}
+
 	} else {
 		res.sendStatus(404);
 	}

@@ -3,6 +3,7 @@ const { eventController } = require('../controllers');
 
 const router = express.Router();
 
+router.get('/search?', eventController.getEventByParams);
 router.get('/', eventController.getAllEvents);
 router.get('/:id', eventController.getEventById);
 

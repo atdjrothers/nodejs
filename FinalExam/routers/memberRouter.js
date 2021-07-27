@@ -3,9 +3,9 @@ const { memberController } = require('../controllers');
 
 const router = express.Router();
 
+router.get('/search', memberController.getMemberByParams);
 router.get('/', memberController.getAllMembers);
 router.get('/:id', memberController.getMemberById);
-router.get('/search', memberController.getMemberByParams);
 
 
 router.post('/',

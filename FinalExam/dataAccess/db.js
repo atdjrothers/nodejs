@@ -45,6 +45,37 @@ class DataAccess {
             .value();
     }
 
+    async getAllFilterByProps(filters) {
+        const dbContext = await this.dbContext;
+        return dbContext
+            .get(this.tableName)
+            .filter(c => {
+                let isValid = true;
+                Object.keys(filters).forEach(k => {
+                    if (!isValid) {
+                        return;
+                    }
+                    
+                    if (k.indexOf('date') > -1 || k.indexOf('Date') > -1) {
+                        const date1 = new Date(c[k]);
+                        const date2 = new Date(filters[k]);
+                        isValid = date1.toLocaleDateString() === date2.toLocaleDateString();
+                    } else {
+                        isValid = c[k] === filters[k];
+                    }
+
+                    return;
+                });
+
+                if (isValid) {
+                    return c;
+                } else {
+                    return;
+                }
+            })
+            .value();
+    }
+
     async insert(data) {
         const dbContext = await this.dbContext;
         const id = uuid();
