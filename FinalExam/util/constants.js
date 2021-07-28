@@ -28,4 +28,10 @@ const ERROR_MESSAGE = Object.freeze({
     MEMBER_DELETE_FAILED_ATTENDANCE_FOUND: 'Unable to member record. Member has attendance records.'
 });
 
-module.exports = { STATUS, EVENT_TYPES, DATE_FORMAT, DATETIME_FORMAT, ERROR_MESSAGE, EVENT_PROPS };
+const ERROR_TYPES = Object.freeze({
+    VALIDATION_ERROR: 'Validation Error',
+    RECORD_NOT_FOUND: 'Record Not Found Error.',
+    INTEGRITY_CONSTRAINT: 'Integrity Constraint Error'
+});
+
+module.exports = { STATUS, EVENT_TYPES, DATE_FORMAT, DATETIME_FORMAT, ERROR_MESSAGE, ERROR_TYPES, EVENT_PROPS };

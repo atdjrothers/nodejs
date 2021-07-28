@@ -1,5 +1,5 @@
 const { attendanceDataAccess, eventDataAccess, memberDataAccess } = require('../dataAccess');
-const { APP_CONSTANTS } = require('../util');
+const { APP_CONSTANTS, ERROR_HANDLER } = require('../util');
 const Joi = require('joi').extend(require('@joi/date'));
 
 /**
@@ -27,19 +27,19 @@ const validateCreateRequest = async (req, res, next) => {
 
 	const { error } = schema.validate(payload);
 	if (error) {
-		res.status(400).send(error.message);
+		next(ERROR_HANDLER.createErrorResponse(error.message, 400, APP_CONSTANTS.ERROR_TYPES.VALIDATION_ERROR));
 	}
 
 	const member = await memberDataAccess.getById(payload.memberId);
 	if (!member) {
-		res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_RECORD_NOT_FOUND);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_RECORD_NOT_FOUND, 400, APP_CONSTANTS.ERROR_TYPES.INTEGRITY_CONSTRAINT));
 	} else {
 		req.body.name = member.name;
 	}
 
 	const event = await eventDataAccess.getById(payload.eventId);
 	if (!event) {
-		res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND, 400, APP_CONSTANTS.ERROR_TYPES.INTEGRITY_CONSTRAINT));
 	}
 
 	next();
@@ -74,7 +74,7 @@ const deleteAttendance = async (req, res, next) => {
 		await attendanceDataAccess.delete(id);
 		res.sendStatus(200);
 	} else {
-		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.ATTENDANCE_RECORD_NOT_FOUND);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.ATTENDANCE_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 

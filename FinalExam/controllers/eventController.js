@@ -1,5 +1,5 @@
 const Joi = require('joi').extend(require('@joi/date'));
-const { APP_CONSTANTS, EXCEL_UTIL } = require('../util');
+const { APP_CONSTANTS, EXCEL_UTIL, ERROR_HANDLER } = require('../util');
 const { eventDataAccess, attendanceDataAccess } = require('../dataAccess');
 const _ = require('lodash');
 
@@ -34,7 +34,7 @@ const getEventById = async (req, res, next) => {
 		const output = { ...data, attendance }
 		res.send(output);
 	} else {
-		res.sendStatus(404);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 
@@ -65,7 +65,7 @@ const getEventByParams = async (req, res, next) => {
 	if (output) {
 		res.send(output);
 	} else {
-		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.NO_RECORDS_FOUND);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.NO_RECORDS_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 
@@ -84,7 +84,7 @@ const getEventByParams = async (req, res, next) => {
 		const fileName = `${event.eventName}_${event.startDate}.xlsx`;
 		EXCEL_UTIL.generateExcelFile(data).write(fileName, res);
 	} else {
-		res.sendStatus(404);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 
@@ -105,7 +105,7 @@ const validateCreateRequest = async (req, res, next) => {
 	
 	const { error } = schema.validate(payload);
 	if (error) {
-		res.status(400).send(error.message);
+		next(ERROR_HANDLER.createErrorResponse(error.message, 400, APP_CONSTANTS.ERROR_TYPES.VALIDATION_ERROR));
 	} else {
 		next();
 	}
@@ -144,12 +144,12 @@ const validateUpdateRequest = async (req, res, next) => {
 
 	const { error } = schema.validate(payload);
 	if (error) {
-		res.status(400).send(error.message);
+		next(ERROR_HANDLER.createErrorResponse(error.message, 400, APP_CONSTANTS.ERROR_TYPES.VALIDATION_ERROR));
 	}
 
 	const event = await eventDataAccess.getById(payload.id);
 	if (!event) {
-		res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 
 	next();
@@ -179,14 +179,14 @@ const deleteEvent = async (req, res, next) => {
 	if (event) {
 		const attendance = await attendanceDataAccess.getAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.EVENT_ID, id);
 		if (attendance) {
-			res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_DELETE_FAILED_ATTENDANCE_FOUND);
+			next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.EVENT_DELETE_FAILED_ATTENDANCE_FOUND, 400, APP_CONSTANTS.ERROR_TYPES.INTEGRITY_CONSTRAINT));
 		} else {
 			await eventDataAccess.delete(id);
 			res.sendStatus(200);
 		}
 
 	} else {
-		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.EVENT_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 

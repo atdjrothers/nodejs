@@ -1,5 +1,5 @@
 const { memberDataAccess, attendanceDataAccess } = require('../dataAccess');
-const { APP_CONSTANTS } = require('../util');
+const { APP_CONSTANTS, ERROR_HANDLER } = require('../util');
 const Joi = require('joi').extend(require('@joi/date'));
 
 /**
@@ -17,7 +17,6 @@ const Joi = require('joi').extend(require('@joi/date'));
  */
 const getAllMembers = async (req, res, next) => {
 	const members = await memberDataAccess.getAll();
-
 	res.send(members);
 };
 
@@ -34,7 +33,7 @@ const getMemberById = async (req, res, next) => {
 		const output = { ...member, attendance }
 		res.send(output);
 	} else {
-		res.sendStatus(404);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 
@@ -60,7 +59,7 @@ const getMemberByParams = async (req, res, next) => {
 	if (output) {
 		res.send(output);
 	} else {
-		res.status(404).send(APP_CONSTANTS.ERROR_MESSAGE.NO_RECORDS_FOUND);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.NO_RECORDS_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 
@@ -76,14 +75,13 @@ const validateCreateRequest = async (req, res, next) => {
 
 	const schema = Joi.object({
 		name: Joi.string().required(),
-		// name: Joi.string().pattern("/^[a-z ,.'-]+$/i").required(),
 		status: Joi.any().valid(...Object.values(APP_CONSTANTS.STATUS)).required(),
 		joinedDate: Joi.date().format(APP_CONSTANTS.DATE_FORMAT).utc()
 	});
 
 	const { error } = schema.validate(payload);
 	if (error) {
-		res.status(400).send(error.message);
+		next(ERROR_HANDLER.createErrorResponse(error.message, 400, APP_CONSTANTS.ERROR_TYPES.VALIDATION_ERROR));
 	} else {
 		next();
 	}
@@ -98,9 +96,7 @@ const validateCreateRequest = async (req, res, next) => {
  */
 const insertMember = async (req, res, next) => {
 	const payload = req.body;
-
 	const member = await memberDataAccess.insert(payload);
-
 	res.status(201).send(member);
 };
 
@@ -121,9 +117,14 @@ const validateUpdateRequest = async (req, res, next) => {
 
 	const { error } = schema.validate(payload);
 	if (error) {
-		res.status(400).send(error.message);
+		next(ERROR_HANDLER.createErrorResponse(error.message, 400, APP_CONSTANTS.ERROR_TYPES.VALIDATION_ERROR));
 	} else {
 		next();
+	}
+
+	const member = await memberDataAccess.getById(payload.id);
+	if (!member) {
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 
@@ -151,14 +152,14 @@ const deleteMember = async (req, res, next) => {
 	if (member) {
 		const attendance = await attendanceDataAccess.getAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.MEMBER_ID, id);
 		if (attendance) {
-			res.status(400).send(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_DELETE_FAILED_ATTENDANCE_FOUND);
+			next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_DELETE_FAILED_ATTENDANCE_FOUND, 400, APP_CONSTANTS.ERROR_TYPES.INTEGRITY_CONSTRAINT));
 		} else {
 			await memberDataAccess.delete(id);
 			res.sendStatus(200);
 		}
 
 	} else {
-		res.sendStatus(404);
+		next(ERROR_HANDLER.createErrorResponse(APP_CONSTANTS.ERROR_MESSAGE.MEMBER_RECORD_NOT_FOUND, 404, APP_CONSTANTS.ERROR_TYPES.RECORD_NOT_FOUND));
 	}
 };
 
