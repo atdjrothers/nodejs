@@ -68,7 +68,7 @@ const getMemberByParams = async (req, res, next) => {
 
 
 /**
- * Validate if Membername or Email Address already exists.
+ * Validate Member Create Request Payload
  * @param {Request} req
  * @param {Response} res
  * @param {NextFunction} next

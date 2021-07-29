@@ -4,17 +4,6 @@ const { eventRouter, memberRouter, attendanceRouter } = require('./routers');
 const { LOGGER } = require('./util');
 
 app.use(express.json());
-/* app.use('/', (req, res, next) => {
-	const msg = {
-		originalUrl: req.originalUrl,
-		headers: req.headers,
-		query: req.query,
-		params: req.params,
-		body: req.body
-	};
-	LOGGER.debug(msg);
-	next();
-}); */
 app.use('/api/events', eventRouter);
 app.use('/api/members', memberRouter);
 app.use('/api/attendance', attendanceRouter);
