@@ -1,5 +1,5 @@
 const { memberDataAccess, attendanceDataAccess } = require('../dataAccess');
-const { APP_CONSTANTS, ERROR_HANDLER } = require('../util');
+const { APP_CONSTANTS, ERROR_HANDLER, LOGGER } = require('../util');
 const Joi = require('joi').extend(require('@joi/date'));
 
 /**
@@ -16,6 +16,7 @@ const Joi = require('joi').extend(require('@joi/date'));
  * @param {NextFunction} next
  */
 const getAllMembers = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'getAllMembers');
 	const members = await memberDataAccess.getAll();
 	res.send(members);
 };
@@ -27,6 +28,7 @@ const getAllMembers = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const getMemberById = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'getMemberById');
 	const member = await memberDataAccess.getById(req.params.id);
 	if (member) {
 		const attendance = await attendanceDataAccess.getAllAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.MEMBER_ID, req.params.id);
@@ -44,6 +46,7 @@ const getMemberById = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const getMemberByParams = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'getMemberByParams');
 	const name = req.query.name;
 	const status = req.query.status;
 	let obj = {};
@@ -71,8 +74,8 @@ const getMemberByParams = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const validateCreateRequest = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'insertMember');
 	const payload = req.body;
-
 	const schema = Joi.object({
 		name: Joi.string().required(),
 		status: Joi.any().valid(...Object.values(APP_CONSTANTS.STATUS)).required(),
@@ -107,6 +110,7 @@ const insertMember = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const validateUpdateRequest = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'updateMember');
 	const payload = req.body;
 	const schema = Joi.object({
 		id: Joi.string().required(),
@@ -147,6 +151,7 @@ const updateMember = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const deleteMember = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'deleteMember');
 	const id = req.params.id;
 	const member = await memberDataAccess.getById(id);
 	if (member) {

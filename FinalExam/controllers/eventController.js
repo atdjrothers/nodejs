@@ -2,6 +2,7 @@ const Joi = require('joi').extend(require('@joi/date'));
 const { APP_CONSTANTS, EXCEL_UTIL, ERROR_HANDLER } = require('../util');
 const { eventDataAccess, attendanceDataAccess } = require('../dataAccess');
 const _ = require('lodash');
+const { LOGGER } = require('../util');
 
 /**
  * https://jsdoc.app/
@@ -17,6 +18,7 @@ const _ = require('lodash');
  * @param {NextFunction} next
  */
 const getAllEvents = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'getAllEvents');
 	const output = await eventDataAccess.getAll();
 	res.send(output);
 };
@@ -28,6 +30,7 @@ const getAllEvents = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const getEventById = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'getEventById');
 	const data = await eventDataAccess.getById(req.params.id);
 	if (data) {
 		const attendance = await attendanceDataAccess.getAllAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.EVENT_ID, req.params.id);
@@ -45,6 +48,7 @@ const getEventById = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const getEventByParams = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'getEventByParams');
 	const eventName = req.query.eventName;
 	const startDate = req.query.startDate;
 	const endDate = req.query.endDate;
@@ -77,6 +81,7 @@ const getEventByParams = async (req, res, next) => {
  * @param {NextFunction} next
  */
  const exportEventById = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'exportEventById');
 	const event = await eventDataAccess.getById(req.query.eventId);
 	if (event) {
 		const attendance = await attendanceDataAccess.getAllAttendanceByProp(APP_CONSTANTS.EVENT_PROPS.EVENT_ID, req.query.eventId);
@@ -95,6 +100,7 @@ const getEventByParams = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const validateCreateRequest = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'insertEvent');
 	const payload = req.body;
 	const schema = Joi.object({
 		eventName: Joi.string().required(),
@@ -133,6 +139,7 @@ const insertEvent = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const validateUpdateRequest = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'updateEvent');
 	const payload = req.body;
 	const schema = Joi.object({
 		id: Joi.string().required(),
@@ -174,6 +181,7 @@ const updateEvent = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const deleteEvent = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'deleteEvent');
 	const id = req.params.id;
 	const event = await eventDataAccess.getById(id);
 	if (event) {

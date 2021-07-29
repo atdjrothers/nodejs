@@ -1,8 +1,20 @@
 const express = require('express');
 const app = express();
 const { eventRouter, memberRouter, attendanceRouter } = require('./routers');
+const { LOGGER } = require('./util');
 
 app.use(express.json());
+/* app.use('/', (req, res, next) => {
+	const msg = {
+		originalUrl: req.originalUrl,
+		headers: req.headers,
+		query: req.query,
+		params: req.params,
+		body: req.body
+	};
+	LOGGER.debug(msg);
+	next();
+}); */
 app.use('/api/events', eventRouter);
 app.use('/api/members', memberRouter);
 app.use('/api/attendance', attendanceRouter);
@@ -14,11 +26,11 @@ app.listen(port, () => {
 });
 
 process.on('uncaughtException', error => {
-	console.log(error.message);
+	LOGGER.fatal(error.message);
 });
 
 process.on('unhandledRejection', error => {
-	console.error(error.message);
+	LOGGER.warn(error.message);
 });
 
 
@@ -29,6 +41,7 @@ function errorHandler (err, req, res, next) {
 		res.status(400);
 	}
 	
+	LOGGER.error(err);
 	res.json({ error: err });
 }
 

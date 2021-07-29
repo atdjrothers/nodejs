@@ -1,5 +1,5 @@
 const { attendanceDataAccess, eventDataAccess, memberDataAccess } = require('../dataAccess');
-const { APP_CONSTANTS, ERROR_HANDLER } = require('../util');
+const { APP_CONSTANTS, ERROR_HANDLER, LOGGER } = require('../util');
 const Joi = require('joi').extend(require('@joi/date'));
 
 /**
@@ -17,6 +17,7 @@ const Joi = require('joi').extend(require('@joi/date'));
  * @param {NextFunction} next
  */
 const validateCreateRequest = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'insertAttendance');
 	const payload = req.body;
 	const schema = Joi.object({
 		eventId: Joi.string().required(),
@@ -68,6 +69,7 @@ const insertAttendance = async (req, res, next) => {
  * @param {NextFunction} next
  */
 const deleteAttendance = async (req, res, next) => {
+	LOGGER.logHttpRequest(req, 'deleteAttendance');
 	const id = req.params.id;
 	const attendance = await attendanceDataAccess.getById(id);
 	if (attendance) {
