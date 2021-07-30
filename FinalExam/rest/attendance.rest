@@ -51,6 +51,19 @@ Content-Type: application/json
 	"timeOut": "2021-07-25 17:00" 
 }
 
+### Update - Date Validation Error
+PUT http://localhost:4000/api/attendance
+Content-Type: application/json
+
+{ 
+	"id": "5ea35d05-3840-4026-88e6-b9234564edc7",
+	"eventId": "a4ca19e0-5066-4897-a9fd-785f8aee328f",
+	"memberId": "87fcf9f4-b3c7-421e-920e-a47dfc82c626",
+	"timeIn": "2021-07-25 18:06",
+	"timeOut": "2021-07-25 17:00",
+	"name": "Zeus"
+}
+
 ### Update - Should update Attendance
 PUT http://localhost:4000/api/attendance
 Content-Type: application/json
